@@ -1,0 +1,7 @@
+{
+  "name": "contenedor-node",
+  "version": "1.0.0",
+  "description": "Ejemplo de Node.js dentro de un contenedor",
+  "main": "app.js",
+  "license": "MIT"
+}
