@@ -3,7 +3,7 @@ const app = express();
 
 // Org.Jorge Chicana
 app.get("/", (req, res) => {    
-    res.send("Hola Chicana Aspajo, desde Node.js dentro de un contenedor Docker.\nOtra línea más desde tu servidor :)");
+    res.send("Hola Jorge Chicana Aspajo, desde Node.js dentro de un contenedor Docker.\nOtra línea más desde tu servidor :)");
 });
 
 
