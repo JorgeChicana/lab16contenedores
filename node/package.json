@@ -2,6 +2,10 @@
   "name": "contenedor-node",
   "version": "1.0.0",
   "description": "Ejemplo de Node.js dentro de un contenedor",
+  "author": "Jorge Chicana",
   "main": "app.js",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }

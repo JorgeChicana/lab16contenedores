@@ -3,8 +3,10 @@ FROM node:18
 WORKDIR /app
 
 COPY package.json .
-COPY *.js .
+COPY . .
+
+RUN npm install
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "app.js"]
