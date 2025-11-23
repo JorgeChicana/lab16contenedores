@@ -3,13 +3,21 @@ const app = express();
 
 // Org.Jorge Chicana
 app.get("/", (req, res) => {
-    res.send("Hola desde Node.js dentro de un contenedor Docker");
+    res.send("Hola Chicana, desde Node.js dentro de un contenedor Docker");
 });
 
 
+// Render (y cualquier servicio en la nube) asigna un puerto dinámico.
+// Ese puerto llega a tu aplicación mediante process.env.PORT
+// Si no existe (ejecución local), usa 3000 por defecto.
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+// Express debe escuchar en 0.0.0.0 para que Render (o Docker)
+// pueda exponer el servidor hacia afuera.
+// Si solo listens en "localhost", Render NO podría acceder.
+app.listen(PORT, "0.0.0.0", () => {
     console.log("Servidor ejecutándose en puerto " + PORT);
 });
+
+
 
