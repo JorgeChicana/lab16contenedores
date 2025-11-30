@@ -66,8 +66,7 @@ jobs:
           context: ./node
           file: ./node/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.actor }}/servidor-app:latest
-
+          tags: ghcr.io/${{ secrets.GHCR_USER }}/servidor-app:latest
       # -----------------------------
       # 4. CD — Notificar a Render
       #
@@ -83,4 +82,4 @@ jobs:
       # -----------------------------
       - name: Trigger Render Deploy Hook (CD)
         run: |
-          curl -X POST ${{ secrets.RENDER_HOOK_URL }}
+          curl -X POST ${{ secrets.RENDER_HOOK_URL }}         
