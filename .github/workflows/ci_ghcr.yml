@@ -1,28 +1,86 @@
-name: CI - Build & Push to GHCR
+name: CI + CD - Build, Push to GHCR & Deploy to Render
+
+# -------------------------------------------------------
+# Este workflow se ejecuta automáticamente en cada push
+# a la rama main. (Despliegue automático)
+# -------------------------------------------------------
 on:
   push:
     branches: [ "main" ]
+
+# -------------------------------------------------------
+# Permisos requeridos: leer el repo y escribir paquetes
+# para poder subir imágenes al GHCR.
+# -------------------------------------------------------
 permissions:
   contents: read
   packages: write
+
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
+      # -----------------------------
+      # 0. Clonar el repositorio
+      # -----------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # -----------------------------
+      # 1. Login a GHCR (CI)
+      #
+      # Autentica a GitHub Container Registry
+      # usando tu token GHCR_PAT guardado como secret.
+      # -----------------------------
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}       
+          password: ${{ secrets.GHCR_PAT }}
+
+      # -----------------------------
+      # 2. Configurar Docker Buildx
+      #
+      # Buildx permite construir imágenes optimizadas.
+      # -----------------------------
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+
+      # -----------------------------
+      # 3. Build + Push de la imagen (CI)
+      #
+      # Construye la imagen usando tu Dockerfile
+      # y sube la imagen generada a GHCR.
+      #
+      # OCUPA:
+      # - context: ruta del proyecto
+      # - file: Dockerfile que construirá la imagen
+      # - push: true (obligatorio para publicar en GHCR)
+      # - tags: nombre de tu imagen en GHCR
+      # -----------------------------
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
           context: ./node
           file: ./node/Dockerfile
           push: true
-          tags: ghcr.io/jorgechicana/servidor-app:latest
+          tags: ghcr.io/${{ github.actor }}/servidor-app:latest
+
+      # -----------------------------
+      # 4. CD — Notificar a Render
+      #
+      # Este paso envía un POST al Deploy Hook de Render.
+      # Esto obliga a Render a:
+      #   ✔ Descargar la imagen nueva desde GHCR
+      #   ✔ Crear contenedor nuevo
+      #   ✔ Eliminar el contenedor antiguo
+      #   ✔ Re-deploy automático
+      #
+      # Debes guardar tu URL del Deploy Hook en:
+      # Settings → Secrets → Actions → RENDER_HOOK_URL
+      # -----------------------------
+      - name: Trigger Render Deploy Hook (CD)
+        run: |
+          curl -X POST ${{ secrets.RENDER_HOOK_URL }}
